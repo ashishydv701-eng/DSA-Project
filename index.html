@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospital Emergency Queue Manager</title>
+  <link rel="stylesheet" href="DS1.css">
+</head>
+<body>
+
+<h1>🏥 Hospital Emergency Room Queue Manager</h1>
+
+<div class="container">
+
+  <!-- Add Patient -->
+  <div class="card">
+    <h2>Add Patient</h2>
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="age" placeholder="Age">
+    <label>Severity (1-10)</label>
+    <input type="range" id="severity" min="1" max="10" value="5">
+    <span id="sevValue">5</span>
+    <button onclick="addPatient()">Add Patient</button>
+  </div>
+
+  <!-- Controls -->
+  <div class="card">
+    <h2>Simulation</h2>
+    <button onclick="treatFIFO()">Treat (FIFO)</button>
+    <button onclick="treatPriority()">Treat (Priority)</button>
+  </div>
+
+  <!-- Patient List -->
+  <div class="card">
+    <h2>Patient Queue</h2>
+    <ul id="patientList"></ul>
+  </div>
+
+  <!-- Comparison -->
+  <div class="card">
+    <h2>Comparison</h2>
+    <p><strong>FIFO Order:</strong> <span id="fifoOrder"></span></p>
+    <p><strong>Priority Order:</strong> <span id="priorityOrder"></span></p>
+  </div>
+
+</div>
+
+<script src="DS1.js"></script>
+</body>
+</html>
