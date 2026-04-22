@@ -12,7 +12,7 @@ async function addPatient() {
   const age = document.getElementById("age").value;
   const severity = document.getElementById("severity").value;
 
-  await fetch("https://alter-discounts-steps-addressed.trycloudflare.com/add", {
+  await fetch("http://localhost:18080/add", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ name, age, severity })
@@ -23,7 +23,7 @@ async function addPatient() {
 
 // Load Patients
 async function loadPatients() {
-  const res = await fetch("https://alter-discounts-steps-addressed.trycloudflare.com/patients");
+  const res = await fetch("http://localhost:18080/patients");
   const data = await res.json();
 
   const list = document.getElementById("patientList");
@@ -54,7 +54,7 @@ async function treatFIFO() {
 
 // Treat Priority
 async function treatPriority() {
-  const res = await fetch("https://alter-discounts-steps-addressed.trycloudflare.com/treat/priority");
+  const res = await fetch("http://localhost:18080/priority");
   const data = await res.json();
 
   priorityOrder.push(data.name);
