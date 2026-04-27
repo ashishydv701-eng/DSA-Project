@@ -1,94 +1,91 @@
-let patients = [];
+let fifoOrder = [];
+let priorityOrder = [];
 
-const severitySlider = document.getElementById("severity");
-const sevValue = document.getElementById("sevValue");
-
-severitySlider.oninput = function () {
-    sevValue.textContent = this.value;
+// Update severity display
+document.getElementById("severity").oninput = function () {
+  document.getElementById("sevValue").innerText = this.value;
 };
 
-function addPatient() {
-    const name = document.getElementById("name").value.trim();
-    const age = document.getElementById("age").value;
-    const disease = document.getElementById("disease").value.trim();
-    const severity = parseInt(document.getElementById("severity").value);
+// Add Patient
+async function addPatient() {
+  const name = document.getElementById("name").value;
+  const age = document.getElementById("age").value;
+  const disease = document.getElementById("disease").value;
+  const severity = document.getElementById("severity").value;
 
-    if (!name || !age || !disease) {
-        alert("Please fill all fields");
-        return;
-    }
+  if (!name || !age || !disease) {
+    alert("Please fill all fields");
+    return;
+  }
 
-    const patient = {
-        name,
-        age,
-        disease,
-        severity
-    };
+  await fetch("http://localhost:18080/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      age,
+      disease,
+      severity
+    })
+  });
 
-    patients.push(patient);
+  loadPatients();
 
-    renderPatients();
-
-    document.getElementById("name").value = "";
-    document.getElementById("age").value = "";
-    document.getElementById("disease").value = "";
-    document.getElementById("severity").value = 5;
-    sevValue.textContent = 5;
+  document.getElementById("name").value = "";
+  document.getElementById("age").value = "";
+  document.getElementById("disease").value = "";
+  document.getElementById("severity").value = 5;
+  document.getElementById("sevValue").innerText = 5;
 }
 
-function renderPatients() {
-    const patientList = document.getElementById("patientList");
-    patientList.innerHTML = "";
+// Load Patients
+async function loadPatients() {
+  const res = await fetch("http://localhost:18080/patients");
+  const data = await res.json();
 
-    patients.forEach(patient => {
-        const li = document.createElement("li");
+  const list = document.getElementById("patientList");
+  list.innerHTML = "";
 
-        let severityClass = "low";
-        if (patient.severity >= 8) severityClass = "high";
-        else if (patient.severity >= 5) severityClass = "medium";
+  data.forEach(p => {
+    let li = document.createElement("li");
 
-        li.classList.add(severityClass);
+    if (p.severity <= 3) li.className = "low";
+    else if (p.severity <= 7) li.className = "medium";
+    else li.className = "high";
 
-        li.innerHTML = `
-            <strong>${patient.name}</strong> (Age: ${patient.age})<br>
-            Disease: ${patient.disease}<br>
-            Severity: ${patient.severity}
-        `;
+    li.innerHTML = `
+      <strong>${p.name}</strong> (Age: ${p.age})<br>
+      Disease: ${p.disease}<br>
+      Severity: ${p.severity}
+    `;
 
-        patientList.appendChild(li);
-    });
+    list.appendChild(li);
+  });
 }
 
-function treatFIFO() {
-    if (patients.length === 0) {
-        alert("No patients in queue");
-        return;
-    }
+// Treat FIFO
+async function treatFIFO() {
+  const res = await fetch("http://localhost:18080/treat/fifo");
+  const data = await res.json();
 
-    const treated = patients.shift();
+  fifoOrder.push(data.name);
+  document.getElementById("fifoOrder").innerText =
+    fifoOrder.join(" → ");
 
-    document.getElementById("fifoOrder").textContent = treated.name;
-
-    renderPatients();
+  loadPatients();
 }
 
-function treatPriority() {
-    if (patients.length === 0) {
-        alert("No patients in queue");
-        return;
-    }
+// Treat Priority
+async function treatPriority() {
+  const res = await fetch("http://localhost:18080/treat/priority");
+  const data = await res.json();
 
-    let maxIndex = 0;
+  priorityOrder.push(data.name);
+  document.getElementById("priorityOrder").innerText =
+    priorityOrder.join(" → ");
 
-    for (let i = 1; i < patients.length; i++) {
-        if (patients[i].severity > patients[maxIndex].severity) {
-            maxIndex = i;
-        }
-    }
-
-    const treated = patients.splice(maxIndex, 1)[0];
-
-    document.getElementById("priorityOrder").textContent = treated.name;
-
-    renderPatients();
+  loadPatients();
 }
+
+// Initial Load
+loadPatients();
