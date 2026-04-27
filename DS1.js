@@ -18,7 +18,7 @@ async function addPatient() {
     return;
   }
 
-  await fetch(" https://tar-reef-yeah-remembered.trycloudflare.com/add", {
+  await fetch("  https://lay-poetry-supervision-kit.trycloudflare.com/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -40,7 +40,7 @@ async function addPatient() {
 
 // Load Patients
 async function loadPatients() {
-  const res = await fetch(" https://tar-reef-yeah-remembered.trycloudflare.com/patients");
+  const res = await fetch("https://lay-poetry-supervision-kit.trycloudflare.com/patients");
   const data = await res.json();
 
   const list = document.getElementById("patientList");
@@ -65,7 +65,7 @@ async function loadPatients() {
 
 // Treat FIFO
 async function treatFIFO() {
-  const res = await fetch(" https://tar-reef-yeah-remembered.trycloudflare.com/treat/fifo");
+  const res = await fetch("https://lay-poetry-supervision-kit.trycloudflare.com/treat/fifo");
   const data = await res.json();
 
   fifoOrder.push(data.name);
@@ -77,7 +77,7 @@ async function treatFIFO() {
 
 // Treat Priority
 async function treatPriority() {
-  const res = await fetch(" https://tar-reef-yeah-remembered.trycloudflare.com/treat/priority");
+  const res = await fetch("https://lay-poetry-supervision-kit.trycloudflare.com/treat/priority");
   const data = await res.json();
 
   priorityOrder.push(data.name);
