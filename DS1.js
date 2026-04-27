@@ -1,67 +1,94 @@
-let fifoOrder = [];
-let priorityOrder = [];
+let patients = [];
 
-// Update severity display
-document.getElementById("severity").oninput = function() {
-  document.getElementById("sevValue").innerText = this.value;
+const severitySlider = document.getElementById("severity");
+const sevValue = document.getElementById("sevValue");
+
+severitySlider.oninput = function () {
+    sevValue.textContent = this.value;
 };
 
-// Add Patient
-async function addPatient() {
-  const name = document.getElementById("name").value;
-  const age = document.getElementById("age").value;
-  const severity = document.getElementById("severity").value;
+function addPatient() {
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value;
+    const disease = document.getElementById("disease").value.trim();
+    const severity = parseInt(document.getElementById("severity").value);
 
-  await fetch("http://localhost:18080/add", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ name, age, severity })
-  });
+    if (!name || !age || !disease) {
+        alert("Please fill all fields");
+        return;
+    }
 
-  loadPatients();
+    const patient = {
+        name,
+        age,
+        disease,
+        severity
+    };
+
+    patients.push(patient);
+
+    renderPatients();
+
+    document.getElementById("name").value = "";
+    document.getElementById("age").value = "";
+    document.getElementById("disease").value = "";
+    document.getElementById("severity").value = 5;
+    sevValue.textContent = 5;
 }
 
-// Load Patients
-async function loadPatients() {
-  const res = await fetch("http://localhost:18080/patients");
-  const data = await res.json();
+function renderPatients() {
+    const patientList = document.getElementById("patientList");
+    patientList.innerHTML = "";
 
-  const list = document.getElementById("patientList");
-  list.innerHTML = "";
+    patients.forEach(patient => {
+        const li = document.createElement("li");
 
-  data.forEach(p => {
-    let li = document.createElement("li");
+        let severityClass = "low";
+        if (patient.severity >= 8) severityClass = "high";
+        else if (patient.severity >= 5) severityClass = "medium";
 
-    if (p.severity <= 3) li.className = "low";
-    else if (p.severity <= 7) li.className = "medium";
-    else li.className = "high";
+        li.classList.add(severityClass);
 
-    li.innerText = `${p.name} (Severity: ${p.severity})`;
-    list.appendChild(li);
-  });
+        li.innerHTML = `
+            <strong>${patient.name}</strong> (Age: ${patient.age})<br>
+            Disease: ${patient.disease}<br>
+            Severity: ${patient.severity}
+        `;
+
+        patientList.appendChild(li);
+    });
 }
 
-// Treat FIFO
-async function treatFIFO() {
-  const res = await fetch(" /treat/fifo");
-  const data = await res.json();
+function treatFIFO() {
+    if (patients.length === 0) {
+        alert("No patients in queue");
+        return;
+    }
 
-  fifoOrder.push(data.name);
-  document.getElementById("fifoOrder").innerText = fifoOrder.join(" → ");
+    const treated = patients.shift();
 
-  loadPatients();
+    document.getElementById("fifoOrder").textContent = treated.name;
+
+    renderPatients();
 }
 
-// Treat Priority
-async function treatPriority() {
-  const res = await fetch("http://localhost:18080/priority");
-  const data = await res.json();
+function treatPriority() {
+    if (patients.length === 0) {
+        alert("No patients in queue");
+        return;
+    }
 
-  priorityOrder.push(data.name);
-  document.getElementById("priorityOrder").innerText = priorityOrder.join(" → ");
+    let maxIndex = 0;
 
-  loadPatients();
+    for (let i = 1; i < patients.length; i++) {
+        if (patients[i].severity > patients[maxIndex].severity) {
+            maxIndex = i;
+        }
+    }
+
+    const treated = patients.splice(maxIndex, 1)[0];
+
+    document.getElementById("priorityOrder").textContent = treated.name;
+
+    renderPatients();
 }
-
-// Initial Load
-loadPatients();
