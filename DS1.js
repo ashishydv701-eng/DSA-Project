@@ -2,7 +2,7 @@ let fifoOrder = [];
 let priorityOrder = [];
 
 // Update severity display
-document.getElementById("severity").oninput = function () {
+document.getElementById("severity").oninput = function() {
   document.getElementById("sevValue").innerText = this.value;
 };
 
@@ -10,37 +10,20 @@ document.getElementById("severity").oninput = function () {
 async function addPatient() {
   const name = document.getElementById("name").value;
   const age = document.getElementById("age").value;
-  const disease = document.getElementById("disease").value;
   const severity = document.getElementById("severity").value;
 
-  if (!name || !age || !disease) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  await fetch("https://proof-cognitive-saturday-broker.trycloudflare.com/add", {
+  await fetch("http://localhost:18080/add", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name,
-      age,
-      disease,
-      severity
-    })
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, age, severity })
   });
 
   loadPatients();
-
-  document.getElementById("name").value = "";
-  document.getElementById("age").value = "";
-  document.getElementById("disease").value = "";
-  document.getElementById("severity").value = 5;
-  document.getElementById("sevValue").innerText = 5;
 }
 
 // Load Patients
 async function loadPatients() {
-  const res = await fetch("https://proof-cognitive-saturday-broker.trycloudflare.com/patients");
+  const res = await fetch("http://localhost:18080/patients");
   const data = await res.json();
 
   const list = document.getElementById("patientList");
@@ -53,36 +36,29 @@ async function loadPatients() {
     else if (p.severity <= 7) li.className = "medium";
     else li.className = "high";
 
-    li.innerHTML = `
-      <strong>${p.name}</strong> (Age: ${p.age})<br>
-      Disease: ${p.disease}<br>
-      Severity: ${p.severity}
-    `;
-
+    li.innerText = `${p.name} (Severity: ${p.severity})`;
     list.appendChild(li);
   });
 }
 
 // Treat FIFO
 async function treatFIFO() {
-  const res = await fetch("https://proof-cognitive-saturday-broker.trycloudflare.com/fifo");
+  const res = await fetch(" /treat/fifo");
   const data = await res.json();
 
   fifoOrder.push(data.name);
-  document.getElementById("fifoOrder").innerText =
-    fifoOrder.join(" → ");
+  document.getElementById("fifoOrder").innerText = fifoOrder.join(" → ");
 
   loadPatients();
 }
 
 // Treat Priority
 async function treatPriority() {
-  const res = await fetch("https://proof-cognitive-saturday-broker.trycloudflare.com/priority");
+  const res = await fetch("http://localhost:18080/treat/priority");
   const data = await res.json();
 
   priorityOrder.push(data.name);
-  document.getElementById("priorityOrder").innerText =
-    priorityOrder.join(" → ");
+  document.getElementById("priorityOrder").innerText = priorityOrder.join(" → ");
 
   loadPatients();
 }
