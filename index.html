@@ -14,11 +14,17 @@
   <!-- Add Patient -->
   <div class="card">
     <h2>Add Patient</h2>
-    <input type="text" id="name" placeholder="Name">
+
+    <input type="text" id="name" placeholder="Patient Name">
+    
     <input type="number" id="age" placeholder="Age">
+
+    <input type="text" id="disease" placeholder="Disease / Problem">
+
     <label>Severity (1-10)</label>
     <input type="range" id="severity" min="1" max="10" value="5">
     <span id="sevValue">5</span>
+
     <button onclick="addPatient()">Add Patient</button>
   </div>
 
@@ -45,5 +51,6 @@
 </div>
 
 <script src="DS1.js"></script>
+
 </body>
 </html>
